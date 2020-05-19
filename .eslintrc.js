@@ -2,52 +2,32 @@ module.exports = {
   root: true,
 
   env: {
-    node: true,
+    node: true
   },
 
-  extends: [
-    'plugin:vue/essential',
-    '@vue/airbnb',
-  ],
+  extends: ['plugin:vue/essential', '@vue/airbnb'],
 
   parserOptions: {
-    parser: 'babel-eslint',
+    parser: 'babel-eslint'
   },
 
   rules: {
-    'object-curly-spacing': [
-      0,
-      'never'
-    ],
-    'max-len': [
-      0,
-      150,
-      4
-    ],
+    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'space-before-function-paren': 0,
-    'no-tabs': 'off',
-    indent: [
-      'off',
-      2
-    ],
-    'no-unused-vars': 'off',
-    semi: [
-      'off',
-      'always'
-    ],
-    'comma-dangle': [
-      2,
-      'never'
-    ],
-    'arrow-parens': 0,
-    'generator-star-spacing': 'off',
-    'no-console': 'off',
-    'no-debugger': 'off'
+    'Missing-trailing-comma' : 0,
+    // 关闭语句强制分号结尾
+    "semi": [0, "always"],
+    //空行最多不能超过100行
+    "no-multiple-empty-lines": [0, {"max": 150}],
+    //关闭禁止混用tab和空格
+    "no-mixed-spaces-and-tabs": [0],
+    "comma-dangle": [0, "never"],
+    "brace-style": [0, "1tbs"],
+    "object-curly-newline": ["error", { "multiline": true }],
+    "arrow-parens": 0,
+    'max-len': ["error", {code : 150}]
   },
 
-  'extends': [
-    'plugin:vue/essential',
-    '@vue/airbnb'
-  ]
+  extends: ['plugin:vue/essential', '@vue/airbnb']
 }
-

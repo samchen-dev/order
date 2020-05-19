@@ -29,21 +29,6 @@
 export default {
   name: 'Login',
   data() {
-    const isEmail = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('用户名不能为空！'));
-      } else {
-        const reg = /^([a-zA-Z]|[0-9])(\w|\-)+@[a-zA-Z0-9]+\.([a-zA-Z]{2,4})$/
-        if (reg.test(value)) {
-          // 用户名符合验证规则
-          this.$refs.loginForm.validateField('password')
-        } else {
-          // 用户名验证不符合规则
-           callback(new Error('用户名不符合邮箱登陆规则！'))
-        }
-      }
-      callback();
-    }
     return {
       loginForm: {
         username: '',
@@ -51,29 +36,44 @@ export default {
       },
       loginRules: {
         username: [
-          {
-            validator: isEmail, trigger: 'blur'
-          }
+          { required: true, message: '用户名能为空！', trigger: 'blur' },
+          { min: 6, max: 10, message: '用户名长度在 6 到 10 个字符！', trigger: 'blur' }
         ],
         password: [
-            { required: true, message: '密码不能为空！', trigger: 'blur' },
-            { min: 6, max: 10, message: '长度在 6 到 10 个字符！', trigger: 'blur' }
+          { required: true, message: '密码不能为空！', trigger: 'blur' },
+          { min: 6, max: 10, message: '密码长度在 6 到 10 个字符！', trigger: 'blur' }
         ]
       }
     }
   },
   methods: {
+    // 重置
     resetLogin() {
       this.$refs.loginForm.resetFields()
     },
+    // 登陆
     login() {
-      this.$refs.loginForm.validate(
-        val => {
-          if (!val) {
-            console.log(val);
+      // 验证登陆表单数据是否符合要求
+      this.$refs.loginForm.validate(val => {
+        if (!val) return
+
+        // 发送请求到server
+        this.$http.post('/login', this.loginForm).then(res => {
+          if (res.data.status === 200) {
+            // 存储token,提示登陆成功
+            window.sessionStorage.setItem('token', res.data.token)
+            this.$message.success('登陆成功！')
+            // 跳转到路由到登陆后的主页面
+            this.$router.replace('/home')
+          } else {
+            // 提示登陆失败
+            this.$message.error(res.data.message)
           }
-        }
-      )
+        }).catch(err => {
+          // 提示异常错误
+          this.$message.error(err)
+        })
+      })
     }
   }
 }
