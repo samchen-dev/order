@@ -13,7 +13,7 @@
       <el-row :gutter="20">
         <el-col :span="14">
           <el-input placeholder="请输入内容" v-model="search">
-            <el-button slot="append" icon="el-icon-search"></el-button>
+            <el-button slot="append" icon="el-icon-search" @click="searchUserList"></el-button>
           </el-input>
         </el-col>
         <el-col :span="4">
@@ -30,13 +30,13 @@
         <el-table-column prop="phone" label="电话" min-width="15%"></el-table-column>
         <el-table-column label="状态" min-width="10%">
           <template slot-scope="scope">
-            <el-switch v-model="scope.row.disableFlog" @change="updateDisableFlog(scope.row)"> </el-switch>
+            <el-switch v-model="scope.row.disableFlog" size="mini" @change="updateDisableFlog(scope.row)"> </el-switch>
           </template>
         </el-table-column>
         <el-table-column label="操作" min-width="10%">
           <template slot-scope="scope">
             <el-tooltip effect="dark" content="修改用户信息" placement="top" :enterable="false">
-              <el-button type="primary" icon="el-icon-edit" size="mini" circle></el-button>
+              <el-button type="primary" icon="el-icon-edit" size="mini" circle @click="editUserInfo(scope.row)"></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="删除用户" placement="top" :enterable="false">
               <el-button type="danger" icon="el-icon-delete" size="mini" @click="delUser(scope.row)" circle></el-button>
@@ -92,6 +92,47 @@
         <el-button type="primary" @click="createUser()" size="mini">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 修改用户对话框 -->
+    <el-dialog title="修改用户信息" :visible.sync="editDialogVisible" @close="editDialogClose()" width="50%">
+      <el-form ref="editFormRef" :model="editUserForm">
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item prop="username">
+              <el-input v-model="editUserForm.username" placeholder="用户名" size="mini" @input="change($event)" disabled></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item prop="name">
+              <el-input v-model="editUserForm.name" placeholder="姓名" size="mini" @input="change($event)"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item prop="phone">
+              <el-input v-model="editUserForm.phone" placeholder="电话" size="mini" @input="change($event)"></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item prop="mail">
+              <el-input v-model="editUserForm.mail" placeholder="邮箱" size="mini" @input="change($event)"></el-input>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="24">
+            <el-checkbox-group v-model="editRoles">
+              <el-checkbox v-for="item in editRoleList" :label="item._id" :checked="item.checked">{{ item.title }}</el-checkbox>
+            </el-checkbox-group>
+          </el-col>
+        </el-row>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDialogVisible = false" size="mini">取 消</el-button>
+        <el-button type="primary" @click="editDialogVisible = false" size="mini">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -137,7 +178,7 @@ export default {
       search: null,
       // 用户列表
       userList: [],
-      // 添加新用户对话框的控制标记
+      // 添加新用户对话框的显示标记
       addDialogVisible: false,
       // 添加新用户
       userForm: {},
@@ -145,7 +186,14 @@ export default {
       roleList: [],
       // 选中的角色
       roles: [],
-
+      // 修改用户对话框的显示标记
+      editDialogVisible: false,
+      // 修改用户信息
+      editUserForm: {},
+      // 修改选中的角色
+      editRoles: [],
+      // 修改用户对话框中角色列表
+      editRoleList: [],
       // 表单验证规则
       addUserRules: {
         username: [
@@ -214,10 +262,18 @@ export default {
       this.$refs.userFormRef.resetFields()
       this.roles = []
     },
+    // 查询用户列表
+    searchUserList() {
+      console.log('searchUserList')
+      if (this.search && this.search.length > 0) {
+        return this.getUserList()
+      }
+      return this.$message.error('查询内容不能为空！')
+    },
     // 返回用户列表
     async getUserList() {
       console.log('getUsername')
-      const username = this.search ? this.search : ""
+      const username = this.search ? this.search : ''
       console.log(username)
       const { data: res } = await this.$http.get('/user/list/v1', {
         params: {
@@ -261,6 +317,44 @@ export default {
       }
       this.getUserList()
       this.$message.success(res.meta.msg)
+    },
+    // 修改用户信息
+    async editUserInfo(userInfo) {
+      console.log('editUserInfo')
+      // 获取所有的角色信息
+      const { data: res } = await this.$http.get('/user/allRoles/v1')
+      if (res.meta.status !== 200) {
+        return this.$message.error(res.meta.msg)
+      }
+      this.editRoleList = res.data.roles
+      const { data: val } = await this.$http.get('/user/profile/v1', {
+        params: {
+          _id: userInfo._id,
+          username: userInfo.username
+        }
+      })
+      if (val.meta.status !== 200) {
+        return this.$message.error(val.meta.msg)
+      }
+      this.editRoleList.map((item, i) => {
+        console.log(`item:${item._id}`)
+        val.data.user.roles.map((n, j) => {
+          console.log("n:" + n._id)
+          if (item._id == n._id) {
+            this.editRoleList[i].checked = true
+          }
+          return n
+        })
+      })
+      this.editUserForm = val.data.user
+      console.log(this.editRoleList)
+      this.editDialogVisible = true
+    },
+    // 关闭更新用户对话框的事件
+    editDialogClose() {
+      console.log('editDialogClose')
+      this.$refs.editFormRef.resetFields()
+      this.editRoles = []
     },
     // 格式化显示用户的角色信息
     formatRoles(row, column) {
