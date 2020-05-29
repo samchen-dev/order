@@ -7,7 +7,7 @@ import './assets/css/normalize.css'
 import './registerServiceWorker'
 
 
-axios.defaults.baseURL = 'http://localhost:3000/api/v1'
+axios.defaults.baseURL = 'http://localhost:3000/api/'
 Vue.prototype.$http = axios
 
 Vue.use(Element)

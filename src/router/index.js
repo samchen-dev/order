@@ -2,6 +2,9 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../components/Login.vue'
 import Home from '../view/Home.vue'
+import Welcome from '../view/Welcome.vue'
+import Users from '../view/system/Users.vue'
+import Rules from '../view/system/Rules.vue'
 
 Vue.use(VueRouter)
 
@@ -19,7 +22,16 @@ const routes = [
   {
     // 授权后的主页面
     path: '/home',
-    component: Home
+    component: Home,
+    redirect: '/welcome',
+    children: [
+      // 欢迎
+      { path: '/welcome', component: Welcome },
+      // 用户管理
+      { path: '/users', component: Users },
+      // 权限管理
+      { path: '/rules', component: Rules }
+    ]
   }
 ]
 

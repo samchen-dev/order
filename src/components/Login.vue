@@ -37,13 +37,17 @@ export default {
       loginRules: {
         username: [
           { required: true, message: '用户名能为空！', trigger: 'blur' },
-          { min: 6, max: 10, message: '用户名长度在 6 到 10 个字符！', trigger: 'blur' }
+          { min: 3, max: 10, message: '用户名长度在 6 到 10 个字符！', trigger: 'blur' }
         ],
         password: [
           { required: true, message: '密码不能为空！', trigger: 'blur' },
           { min: 6, max: 10, message: '密码长度在 6 到 10 个字符！', trigger: 'blur' }
         ]
       }
+    };
+    
+    let mailPass = (rule, value, callback) => {
+      console.log('mailPass')
     }
   },
   methods: {
@@ -54,25 +58,22 @@ export default {
     // 登陆
     login() {
       // 验证登陆表单数据是否符合要求
-      this.$refs.loginForm.validate(val => {
+      this.$refs.loginForm.validate(async val => {
         if (!val) return
 
         // 发送请求到server
-        this.$http.post('/login', this.loginForm).then(res => {
-          if (res.data.status === 200) {
-            // 存储token,提示登陆成功
-            window.sessionStorage.setItem('token', res.data.token)
-            this.$message.success('登陆成功！')
-            // 跳转到路由到登陆后的主页面
-            this.$router.replace('/home')
-          } else {
-            // 提示登陆失败
-            this.$message.error(res.data.message)
-          }
-        }).catch(err => {
-          // 提示异常错误
-          this.$message.error(err)
-        })
+        const { data: res } = await this.$http.post('/user/login/v1', this.loginForm)
+        console.log(res)
+        if (res.meta.status === 200) {
+          // 存储token,提示登陆成功
+          window.sessionStorage.setItem('token', res.data.token)
+          this.$message.success('登陆成功！')
+          // 跳转到路由到登陆后的主页面
+          this.$router.replace('/home')
+        } else {
+          // 提示登陆失败
+          this.$message.error(res.meta.msg)
+        }
       })
     }
   }

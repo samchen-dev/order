@@ -24,9 +24,11 @@ module.exports = {
     "no-mixed-spaces-and-tabs": [0],
     "comma-dangle": [0, "never"],
     "brace-style": [0, "1tbs"],
-    "object-curly-newline": ["error", { "multiline": true }],
+    'object-curly-newline': 0,
     "arrow-parens": 0,
-    'max-len': ["error", {code : 150}]
+    'max-len': ["error", {code : 150}],
+    "consistent-return": 0,
+    "no-restricted-syntax": 0
   },
 
   extends: ['plugin:vue/essential', '@vue/airbnb']

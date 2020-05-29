@@ -1,15 +1,15 @@
 <template>
-  <div id="app">
-    <router-view></router-view>
+  <div>
+    权限管理
   </div>
 </template>
 
 <script>
 export default {
-  name: 'app'
+  name: 'Rules'
 }
 </script>
 
-<style>
+<style lang="less" scoped>
 
 </style>
