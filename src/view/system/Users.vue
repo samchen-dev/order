@@ -326,7 +326,8 @@ export default {
       if (res.meta.status !== 200) {
         return this.$message.error(res.meta.msg)
       }
-      this.editRoleList = res.data.roles
+
+      // 获取要修改用户个人信息
       const { data: val } = await this.$http.get('/user/profile/v1', {
         params: {
           _id: userInfo._id,
@@ -336,18 +337,14 @@ export default {
       if (val.meta.status !== 200) {
         return this.$message.error(val.meta.msg)
       }
-      this.editRoleList.map((item, i) => {
-        console.log(`item:${item._id}`)
-        val.data.user.roles.map((n, j) => {
-          console.log("n:" + n._id)
-          if (item._id == n._id) {
-            this.editRoleList[i].checked = true
-          }
-          return n
-        })
-      })
-      this.editUserForm = val.data.user
-      console.log(this.editRoleList)
+      // 设置角色列表信息
+      this.editRoleList = res.data.roles
+      // 设置用户个人信息
+      this.editUserForm = val.data.user      
+      // 设置默认选中的角色信息
+      this.editRoles = []
+      this.editUserForm.roles.map(item => this.editRoles.push(item._id))
+      // 打开对话框
       this.editDialogVisible = true
     },
     // 关闭更新用户对话框的事件

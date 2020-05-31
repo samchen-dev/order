@@ -6,7 +6,7 @@ import router from './router'
 import './assets/css/normalize.css'
 import './registerServiceWorker'
 
-
+Vue.config.devtools = true;
 axios.defaults.baseURL = 'http://localhost:3000/api/'
 Vue.prototype.$http = axios
 
