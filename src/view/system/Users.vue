@@ -81,9 +81,11 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="24">
-            <el-checkbox-group v-model="roles">
-              <el-checkbox v-for="item in roleList" :label="item._id">{{ item.title }}</el-checkbox>
-            </el-checkbox-group>
+            <el-form-item prop="roles">
+              <el-checkbox-group v-model="userForm.roles">
+                <el-checkbox v-for="item in roleList" :label="item._id" name="roles">{{ item.title }}</el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
           </el-col>
         </el-row>
       </el-form>
@@ -95,7 +97,7 @@
 
     <!-- 修改用户对话框 -->
     <el-dialog title="修改用户信息" :visible.sync="editDialogVisible" @close="editDialogClose()" width="50%">
-      <el-form ref="editFormRef" :model="editUserForm">
+      <el-form ref="editFormRef" :model="editUserForm" :rules="editUserRules">
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item prop="username">
@@ -122,15 +124,17 @@
         </el-row>
         <el-row :gutter="20">
           <el-col :span="24">
-            <el-checkbox-group v-model="editRoles">
-              <el-checkbox v-for="item in editRoleList" :label="item._id" :checked="item.checked">{{ item.title }}</el-checkbox>
-            </el-checkbox-group>
+            <el-form-item prop="roles">
+              <el-checkbox-group v-model="editUserForm.roles">
+                <el-checkbox name="roles" v-for="item in editRoleList" :label="item._id">{{ item.title }}</el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editDialogVisible = false" size="mini">取 消</el-button>
-        <el-button type="primary" @click="editDialogVisible = false" size="mini">确 定</el-button>
+        <el-button type="primary" @click="editUpdateDialog()" size="mini">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -140,7 +144,7 @@
 export default {
   data() {
     // 验证邮箱
-    let validateMail = (rule, value, callback) => {
+    const validateMail = (rule, value, callback) => {
       console.log('validateMail')
 
       if (value === '') {
@@ -152,7 +156,7 @@ export default {
       }
     }
     // 验证邮箱
-    let validatePhone = (rule, value, callback) => {
+    const validatePhone = (rule, value, callback) => {
       console.log('validatePhone')
       if (value === '') {
         callback(new Error('电话号码不能为空！'))
@@ -163,7 +167,7 @@ export default {
       }
     }
     // 验证用户名指接受字符串
-    let validateUsername = (rule, value, callback) => {
+    const validateUsername = (rule, value, callback) => {
       console.log('validateUsername')
       if (value === '') {
         callback(new Error('用户名不能为空！'))
@@ -173,6 +177,11 @@ export default {
         callback()
       }
     }
+    const validateRoles = (rule, value, callback) => {
+      console.log('validateRoles')
+      console.log(rule)
+      console.log(value)
+    }
     return {
       // 查询条件
       search: null,
@@ -181,17 +190,20 @@ export default {
       // 添加新用户对话框的显示标记
       addDialogVisible: false,
       // 添加新用户
-      userForm: {},
+      userForm: {
+        username: '',
+        password: '',
+        name: '',
+        phone: '',
+        mail: '',
+        roles: [],
+      },
       // 角色列表
       roleList: [],
-      // 选中的角色
-      roles: [],
       // 修改用户对话框的显示标记
       editDialogVisible: false,
       // 修改用户信息
       editUserForm: {},
-      // 修改选中的角色
-      editRoles: [],
       // 修改用户对话框中角色列表
       editRoleList: [],
       // 表单验证规则
@@ -199,25 +211,47 @@ export default {
         username: [
           { required: true, message: '用户名不能为空！', trigger: 'blur' },
           { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' },
-          { validator: validateUsername, trigger: 'blur' }
+          { validator: validateUsername, trigger: 'blur' },
         ],
         password: [
           { required: true, message: '密码不能为空！', trigger: 'blur' },
-          { min: 6, max: 10, message: '密码长度在 6 到 10 个字符！', trigger: 'blur' }
+          { min: 6, max: 10, message: '密码长度在 6 到 10 个字符！', trigger: 'blur' },
         ],
         mail: [
           { required: true, message: '邮箱名称不能为空！', trigger: 'blur' },
-          { validator: validateMail, trigger: 'blur' }
+          { validator: validateMail, trigger: 'blur' },
         ],
         phone: [
           { required: true, message: '电话号码不能为空！', trigger: 'blur' },
-          { validator: validatePhone, trigger: 'blur' }
+          { validator: validatePhone, trigger: 'blur' },
         ],
         name: [
           { required: true, message: '姓名不能为空！', trigger: 'blur' },
-          { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' }
+          { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' },
+        ],
+        roles: [{ type: 'array', required: true, message: '至少选择一种权限！', trigger: 'change' }],
+      },
+      editUserRules: {
+        password: [
+          { required: true, message: '密码不能为空！', trigger: 'blur' },
+          { min: 6, max: 10, message: '密码长度在 6 到 10 个字符！', trigger: 'blur' },
+        ],
+        mail: [
+          { required: true, message: '邮箱名称不能为空！', trigger: 'blur' },
+          { validator: validateMail, trigger: 'blur' },
+        ],
+        phone: [
+          { required: true, message: '电话号码不能为空！', trigger: 'blur' },
+          { validator: validatePhone, trigger: 'blur' },
+        ],
+        name: [
+          { required: true, message: '姓名不能为空！', trigger: 'blur' },
+          { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'blur' },
+        ],
+        roles: [
+          { type: 'array', required: true, message: '至少选择一种权限！', trigger: 'change' }
         ]
-      }
+      },
     }
   },
   created() {
@@ -237,11 +271,9 @@ export default {
     // 保存用户
     createUser() {
       // 验证表单数据是否符合要求
-      this.$refs.userFormRef.validate(async val => {
+      this.$refs.userFormRef.validate(async (val) => {
         if (!val) return
         console.log('createUser')
-        console.log(this.roles)
-        this.userForm.roles = this.roles
         const { data: res } = await this.$http.post('/user/register/v1', this.userForm)
         if (res.meta.status !== 200) {
           return this.$message.error(res.meta.msg)
@@ -252,7 +284,6 @@ export default {
         this.getUserList()
         // 清空表单项和保存数据的对象
         this.$refs.userFormRef.resetFields()
-        this.roles = []
       })
     },
     // 关闭添加新用户对话框的事件
@@ -260,7 +291,6 @@ export default {
       // 清空表单项和保存数据的对象
       console.log('addDialogClose')
       this.$refs.userFormRef.resetFields()
-      this.roles = []
     },
     // 查询用户列表
     searchUserList() {
@@ -277,8 +307,8 @@ export default {
       console.log(username)
       const { data: res } = await this.$http.get('/user/list/v1', {
         params: {
-          username
-        }
+          username,
+        },
       })
       if (res.meta.status !== 200) {
         return this.$message.error(res.meta.msg)
@@ -291,8 +321,8 @@ export default {
       const { data: res } = await this.$http.get('/user/updateDisableFlog/v1', {
         params: {
           _id: userInfo._id,
-          disableFlog: userInfo.disableFlog
-        }
+          disableFlog: userInfo.disableFlog,
+        },
       })
 
       if (res.meta.status !== 200) {
@@ -308,8 +338,8 @@ export default {
       const { data: res } = await this.$http.get('/user/delete/v1', {
         params: {
           _id: userInfo._id,
-          username: userInfo.username
-        }
+          username: userInfo.username,
+        },
       })
 
       if (res.meta.status !== 200) {
@@ -331,8 +361,8 @@ export default {
       const { data: val } = await this.$http.get('/user/profile/v1', {
         params: {
           _id: userInfo._id,
-          username: userInfo.username
-        }
+          username: userInfo.username,
+        },
       })
       if (val.meta.status !== 200) {
         return this.$message.error(val.meta.msg)
@@ -340,10 +370,7 @@ export default {
       // 设置角色列表信息
       this.editRoleList = res.data.roles
       // 设置用户个人信息
-      this.editUserForm = val.data.user      
-      // 设置默认选中的角色信息
-      this.editRoles = []
-      this.editUserForm.roles.map(item => this.editRoles.push(item._id))
+      this.editUserForm = val.data.user
       // 打开对话框
       this.editDialogVisible = true
     },
@@ -351,14 +378,32 @@ export default {
     editDialogClose() {
       console.log('editDialogClose')
       this.$refs.editFormRef.resetFields()
-      this.editRoles = []
     },
+
+    // 更新用户信息
+    async editUpdateDialog() {
+      console.log('editUpdateDialog')
+      console.log(this.editUserForm)
+      const { data: res } = await this.$http.post('/user/update/v1', { user: this.editUserForm })
+      if (res.meta.status !== 200) {
+        // 发送错误提示
+        return this.$message.error(res.message)
+      }
+      // 关闭修改用户信息对话框
+      this.editDialogVisible = false
+      // 更新用户列表
+      this.getUserList()
+      this.$refs.editFormRef.resetFields()
+      // 发送成功提示
+      this.$message.success(res.meta.msg)
+    },
+
     // 格式化显示用户的角色信息
     formatRoles(row, column) {
       console.log('formatRoles')
       if (row.roles.length > 0) {
         const roles = []
-        row.roles.map(item => roles.push(item.title))
+        row.roles.map((item) => roles.push(item.title))
         return roles.join(',')
       }
       return ''
@@ -366,8 +411,8 @@ export default {
     // 解决键盘输入问题
     change(e) {
       this.$forceUpdate()
-    }
-  }
+    },
+  },
 }
 </script>
 
