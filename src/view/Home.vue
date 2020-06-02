@@ -36,7 +36,7 @@
               <i class="el-icon-document"></i>
               <span slot="title">订单管理</span>
             </template>
-            <el-menu-item index="2-1">
+            <el-menu-item index="/sheet">
               <i class="el-icon-data-line"></i>
               <span slot="title">产品报价</span>
             </el-menu-item>

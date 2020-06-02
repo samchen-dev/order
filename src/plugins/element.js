@@ -25,7 +25,9 @@ import {
   Dialog,
   Divider,
   CheckboxGroup,
-  Checkbox
+  Checkbox,
+  TabPane,
+  Tabs
 } from 'element-ui'
 import Vue from 'vue'
 
@@ -55,5 +57,7 @@ Vue.use(Dialog)
 Vue.use(Divider)
 Vue.use(CheckboxGroup)
 Vue.use(Checkbox)
+Vue.use(TabPane)
+Vue.use(Tabs)
 
 Vue.prototype.$message = Message
