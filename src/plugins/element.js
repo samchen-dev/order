@@ -27,7 +27,8 @@ import {
   CheckboxGroup,
   Checkbox,
   TabPane,
-  Tabs
+  Tabs,
+  Autocomplete
 } from 'element-ui'
 import Vue from 'vue'
 
@@ -59,5 +60,6 @@ Vue.use(CheckboxGroup)
 Vue.use(Checkbox)
 Vue.use(TabPane)
 Vue.use(Tabs)
+Vue.use(Autocomplete)
 
 Vue.prototype.$message = Message

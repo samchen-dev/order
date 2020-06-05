@@ -6,6 +6,7 @@ import Welcome from '../view/Welcome.vue'
 import Users from '../view/system/Users.vue'
 import Rules from '../view/system/Rules.vue'
 import Sheet from '../view/form/Sheet.vue'
+import Tmp from '../view/form/tmp.vue'
 
 Vue.use(VueRouter)
 
@@ -33,7 +34,9 @@ const routes = [
       // 权限管理
       { path: '/rules', component: Rules },
       // 报价表
-      { path: '/sheet', component: Sheet }
+      { path: '/sheet', component: Sheet },
+      // 测试
+      { path: '/tmp', component: Tmp }
     ]
   }
 ]
