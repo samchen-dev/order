@@ -32,10 +32,10 @@
             </el-menu-item>
           </el-submenu>
           <el-submenu index="2">
-            <template slot="title">
-              <i class="el-icon-document"></i>
-              <span slot="title">订单管理</span>
-            </template>
+            <el-menu-item index="/product">
+              <i class="el-icon-paperclip"></i>
+              <span slot="title">产品分类</span>
+            </el-menu-item>
             <el-menu-item index="/sheet">
               <i class="el-icon-data-line"></i>
               <span slot="title">产品报价</span>
@@ -48,6 +48,10 @@
               <i class="el-icon-view"></i>
               <span slot="title">跟踪订单</span>
             </el-menu-item>
+            <template slot="title">
+              <i class="el-icon-document"></i>
+              <span slot="title">订单管理</span>
+            </template>
           </el-submenu>
           <el-submenu index="3">
             <template slot="title">

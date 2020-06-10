@@ -28,7 +28,8 @@ import {
   Checkbox,
   TabPane,
   Tabs,
-  Autocomplete
+  Autocomplete,
+  Tag
 } from 'element-ui'
 import Vue from 'vue'
 
@@ -61,5 +62,6 @@ Vue.use(Checkbox)
 Vue.use(TabPane)
 Vue.use(Tabs)
 Vue.use(Autocomplete)
+Vue.use(Tag)
 
 Vue.prototype.$message = Message

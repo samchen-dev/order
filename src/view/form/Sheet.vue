@@ -30,11 +30,11 @@
     </el-card>
     <!-- 添加新报价对话框 -->
     <el-dialog class="addDialog" title="新报价" :visible.sync="addDialogVisible" @close="addDialogClose()" width="75%">
-      <el-form ref="addQuoteFromRef" :model="newLevel" :rules="addQuoteRules" label-width="55px" label-position="right">
+      <el-form ref="addQuoteFromRef" :model="newLevel" :rules="addQuoteRules" label-width="55px" label-position="right" size="mini">
         <el-row :gutter="10">
           <el-col :span="16">
             <el-form-item label="级别:" prop="level">
-              <el-input placeholder="级别" v-model="newLevel.level" size="mini" maxlength="70" show-word-limit></el-input>
+              <el-input placeholder="级别" v-model="newLevel.level" maxlength="70" show-word-limit></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
@@ -52,42 +52,57 @@
         </el-row>
         <el-row>
           <el-col :span="24">
-            <el-form-item label="描  述:">
-              <el-input placeholder="描述" v-model="newLevel.description" type="textarea" size="mini" maxlength="200" show-word-limit></el-input>
+            <el-form-item label="描  述:" prop="description">
+              <el-input placeholder="描述" v-model="newLevel.description" type="textarea" maxlength="200" show-word-limit></el-input>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row :gutter="10" v-for="(item, index) in newLevel.assort" :key="index" type="flex" justify="center" align="middle">
+        <el-row :gutter="10" v-for="(item, index) in newLevel.assort" type="flex" justify="center" align="middle">
           <el-col :span="6">
-            <el-form-item label="规格:" prop="size">
-              <el-input placeholder="规格" v-model="item.size" size="mini" maxlength="40" show-word-limit></el-input>
+            <el-form-item
+              label="规格:"
+              :prop="'assort.' + index + '.size'"
+              :rules="{ required: true, message: '规格不能为空！', trigger: 'blur' }"
+            >
+              <el-input placeholder="规格" v-model="item.size" maxlength="40" show-word-limit></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="6">
-            <el-form-item label="价格:" prop="quote">
-              <el-input placeholder="价格" v-model.number="item.quote" type="number" size="mini"></el-input>
+            <el-form-item
+              label="价格:"
+              :prop="'assort.' + index + '.quote'"
+              :rules="[
+                { required: true, message: '价格不能为空' },
+                { type: 'number', message: '价格必须为数字值' }
+              ]"
+            >
+              <el-input placeholder="价格" v-model.number="item.quote">
+                <template slot="append">$</template>
+              </el-input>
             </el-form-item>
           </el-col>
           <el-col :span="7">
-            <el-form-item label="指标:" prop="spece">
-              <el-input placeholder="指标" v-model="item.spece" size="mini" maxlength="40" show-word-limit></el-input>
+            <el-form-item label="指标:"
+              :prop="'assort.' + index + '.spece'"
+            >
+              <el-input placeholder="指标" v-model="item.spece" maxlength="40" show-word-limit></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="5" class="col-button">
             <el-form-item>
               <el-button-group>
-                <el-button size="mini" icon="el-icon-plus" @click="addAssort(index)"></el-button>
-                <el-button size="mini" icon="el-icon-minus" @click="delAssort(index)"></el-button>
-                <el-button size="mini" icon="el-icon-top" @click="upAssort(index)"></el-button>
-                <el-button size="mini" icon="el-icon-bottom" @click="downAssort(index)"></el-button>
+                <el-button icon="el-icon-plus" @click="addAssort(index)"></el-button>
+                <el-button icon="el-icon-minus" @click="delAssort(index)"></el-button>
+                <el-button icon="el-icon-top" @click="upAssort(index)"></el-button>
+                <el-button icon="el-icon-bottom" @click="downAssort(index)"></el-button>
               </el-button-group>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="addDialogVisible = false" size="mini">取 消</el-button>
-        <el-button type="primary" @click="addDialogVisible = false" size="mini">确 定</el-button>
+        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addLevel()">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -111,6 +126,8 @@ export default {
           specs: '陶瓷级'
         }
       ],
+      // 级别列表
+      levelData: [],
       // 添加新分类
       newLevel: {
         level: '',
@@ -119,7 +136,7 @@ export default {
         assort: [
           {
             size: '',
-            quote: 0,
+            quote: '',
             spece: ''
           }
         ]
@@ -128,18 +145,8 @@ export default {
       restaurants: [],
       // 新建报价分类验证规则
       addQuoteRules: {
-        level: [
-          { required: true, message: '级别名不能为空！', trigger: 'blur' }
-        ],
-        port: [
-          { required: true, message: '港口名不能为空！', trigger: 'change' }
-        ],
-        size: [
-          { required: true, message: '规格不能为空！', trigger: 'blur' }
-        ],
-        quote: [
-          { required: true, message: '报价不能为空！', trigger: 'blur' }
-        ]
+        level: [{ required: true, message: '级别名不能为空！', trigger: 'blur' }],
+        port: [{ required: true, message: '港口名不能为空！', trigger: 'change' }]
       }
     }
   },
@@ -147,13 +154,12 @@ export default {
     // 解决键盘输入问题
     change(e) {
       console.log('change')
-      console.log(e)
       return this.$forceUpdate()
     },
     // 添加分类价格
     addAssort(index) {
       console.log('addAssort')
-      this.newLevel.assort.splice(index, 0, { size: '', quote: 0, spece: '' })
+      this.newLevel.assort.splice(index + 1, 0, { size: '', quote: '', spece: '' })
     },
     // 删除分类价格
     delAssort(index) {
@@ -185,6 +191,16 @@ export default {
       }
       console.log(this.newLevel.assort)
     },
+    // 添加级别
+    addLevel() {
+      // 添加到级别列表
+      console.log('addLevel')
+      this.$refs.addQuoteFromRef.validate(val => {
+        if (!val) return
+        this.levelData.push(this.newLevel)
+        this.addDialogVisible = false
+      })
+    },
     // 起运港返回建议列表
     querySearch(queryString, cb) {
       cb(this.restaurants)
@@ -205,7 +221,8 @@ export default {
     // 关闭添加事件
     addDialogClose() {
       console.log('addDialogClose')
-      this.$refs.addQuoteFromRef.resetFields()
+      // this.$refs.addQuoteFromRef.resetFields()
+      // this.newLevel.assort = [{ size: '', quote: '', spece: '' }]
     }
   },
   mounted() {
