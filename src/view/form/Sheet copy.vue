@@ -11,11 +11,25 @@
     <el-card class="box-card">
       <!-- 显示报价分类 -->
       <el-tabs tab-position="right">
-        <el-tab-pane v-for="item in products" :lazy="true" :label="item.title"><Rank v-bind:id="item._id"></Rank></el-tab-pane>
+        <el-tab-pane label="白刚玉">
+          <el-table :data="tableData" style="width: 100%">
+            <el-table-column prop="level" label="级别"></el-table-column>
+            <el-table-column prop="description" label="描述"></el-table-column>
+            <el-table-column prop="port" label="起运港"></el-table-column>
+            <el-table-column prop="size" label="规格"></el-table-column>
+            <el-table-column prop="quote" label="报价"></el-table-column>
+            <el-table-column prop="specs" label="指标"></el-table-column>
+          </el-table>
+          <el-button type="primary" @click="addDialogVisible = true">添加分类</el-button>
+          <el-button type="primary">修改分类</el-button>
+        </el-tab-pane>
+        <el-tab-pane label="棕刚玉">棕刚玉报价单</el-tab-pane>
+        <el-tab-pane label="铬钢玉">铬钢玉报价单</el-tab-pane>
+        <el-tab-pane label="板状刚玉">板状刚玉报价单</el-tab-pane>
       </el-tabs>
     </el-card>
     <!-- 添加新报价对话框 -->
-    <!-- <el-dialog class="addDialog" title="新报价" :visible.sync="addDialogVisible" @close="addDialogClose()" width="75%">
+    <el-dialog class="addDialog" title="新报价" :visible.sync="addDialogVisible" @close="addDialogClose()" width="75%">
       <el-form ref="addQuoteFromRef" :model="newLevel" :rules="addQuoteRules" label-width="55px" label-position="right" size="mini">
         <el-row :gutter="10">
           <el-col :span="16">
@@ -90,20 +104,45 @@
         <el-button @click="addDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="addLevel()">确 定</el-button>
       </span>
-    </el-dialog> -->
+    </el-dialog>
   </div>
 </template>
 
 <script>
-// 引入子组件
-import Rank from './Rank'
-
 export default {
   name: 'Sheet',
   data() {
     return {
-      // 产品名称列表
-      products: [],
+      // 显示分类对话框控制标记
+      addDialogVisible: false,
+      // 显示列表数据
+      tableData: [
+        {
+          level: '陶瓷砂',
+          description: 'F24-F54',
+          port: 'QINGDAO/TIANJIN',
+          size: 'F24',
+          quote: '820',
+          specs: '陶瓷级'
+        }
+      ],
+      // 级别列表
+      levelData: [],
+      // 添加新分类
+      newLevel: {
+        level: '',
+        port: '',
+        description: '',
+        assort: [
+          {
+            size: '',
+            quote: '',
+            spece: ''
+          }
+        ]
+      },
+      // 潜在起运港列表
+      restaurants: [],
       // 新建报价分类验证规则
       addQuoteRules: {
         level: [{ required: true, message: '级别名不能为空！', trigger: 'blur' }],
@@ -111,20 +150,7 @@ export default {
       }
     }
   },
-  created() {
-    // 初始化列表
-    this.listProduct()
-  },
   methods: {
-    // 获取产品名称列表
-    async listProduct() {
-      console.log('listProduct')
-      const { data: res } = await this.$http.get('product/list/v1')
-      if (res.meta.status !== 200) {
-        return this.$message.err(res.meta.msg)
-      }
-      this.products = res.data.products
-    },
     // 解决键盘输入问题
     change(e) {
       console.log('change')
@@ -201,10 +227,6 @@ export default {
   },
   mounted() {
     this.restaurants = this.loadAll()
-  },
-  // 注册子组件
-  components: {
-    Rank
   }
 }
 </script>

@@ -29,7 +29,7 @@ import {
   TabPane,
   Tabs,
   Autocomplete,
-  Tag
+  Tag,
 } from 'element-ui'
 import Vue from 'vue'
 
