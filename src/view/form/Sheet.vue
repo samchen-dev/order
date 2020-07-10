@@ -14,89 +14,12 @@
         <el-tab-pane v-for="item in products" :lazy="true" :label="item.title"><Rank v-bind:id="item._id"></Rank></el-tab-pane>
       </el-tabs>
     </el-card>
-    <!-- 添加新报价对话框 -->
-    <!-- <el-dialog class="addDialog" title="新报价" :visible.sync="addDialogVisible" @close="addDialogClose()" width="75%">
-      <el-form ref="addQuoteFromRef" :model="newLevel" :rules="addQuoteRules" label-width="55px" label-position="right" size="mini">
-        <el-row :gutter="10">
-          <el-col :span="16">
-            <el-form-item label="级别:" prop="level">
-              <el-input placeholder="级别" v-model="newLevel.level" maxlength="70" show-word-limit></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item label="港口:" prop="port">
-              <el-autocomplete
-                v-model="newLevel.port"
-                :fetch-suggestions="querySearch"
-                placeholder="起运港"
-                @select="handleSelect"
-                style="width:100%"
-                size="mini"
-              ></el-autocomplete>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="描  述:" prop="description">
-              <el-input placeholder="描述" v-model="newLevel.description" type="textarea" maxlength="200" show-word-limit></el-input>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="10" v-for="(item, index) in newLevel.assort" type="flex" justify="center" align="middle">
-          <el-col :span="6">
-            <el-form-item
-              label="规格:"
-              :prop="'assort.' + index + '.size'"
-              :rules="{ required: true, message: '规格不能为空！', trigger: 'blur' }"
-            >
-              <el-input placeholder="规格" v-model="item.size" maxlength="40" show-word-limit></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="6">
-            <el-form-item
-              label="价格:"
-              :prop="'assort.' + index + '.quote'"
-              :rules="[
-                { required: true, message: '价格不能为空' },
-                { type: 'number', message: '价格必须为数字值' }
-              ]"
-            >
-              <el-input placeholder="价格" v-model.number="item.quote">
-                <template slot="append">$</template>
-              </el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="7">
-            <el-form-item label="指标:"
-              :prop="'assort.' + index + '.spece'"
-            >
-              <el-input placeholder="指标" v-model="item.spece" maxlength="40" show-word-limit></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col :span="5" class="col-button">
-            <el-form-item>
-              <el-button-group>
-                <el-button icon="el-icon-plus" @click="addAssort(index)"></el-button>
-                <el-button icon="el-icon-minus" @click="delAssort(index)"></el-button>
-                <el-button icon="el-icon-top" @click="upAssort(index)"></el-button>
-                <el-button icon="el-icon-bottom" @click="downAssort(index)"></el-button>
-              </el-button-group>
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="addDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="addLevel()">确 定</el-button>
-      </span>
-    </el-dialog> -->
   </div>
 </template>
 
 <script>
 // 引入子组件
-import Rank from './Rank'
+import Rank from './Rank.vue'
 
 export default {
   name: 'Sheet',

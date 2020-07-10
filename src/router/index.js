@@ -7,6 +7,9 @@ import Users from '../view/system/Users.vue'
 import Rules from '../view/system/Rules.vue'
 import Sheet from '../view/form/Sheet.vue'
 import Product from '../view/form/Product.vue'
+import OrderMain from '../view/form/OrderMain.vue'
+import OrderWizard from '../view/form/OrderWizard.vue'
+import OrderExpert from '../view/form/OrderExpert.vue'
 import Tmp from '../view/form/tmp.vue'
 
 Vue.use(VueRouter)
@@ -38,6 +41,12 @@ const routes = [
       { path: '/product', component: Product },
       // 报价表
       { path: '/sheet', component: Sheet },
+      // 订单向导
+      { path: '/ordermain', component: OrderMain },
+      // 向导模式
+      { path: '/orderwizard', component: OrderWizard },
+      // 专家模式
+      { path: '/orderexpert', component: OrderExpert },
       // 测试
       { path: '/tmp', component: Tmp }
     ]

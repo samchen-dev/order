@@ -30,6 +30,9 @@ import {
   Tabs,
   Autocomplete,
   Tag,
+  Steps,
+  Step,
+  DatePicker
 } from 'element-ui'
 import Vue from 'vue'
 
@@ -63,5 +66,8 @@ Vue.use(TabPane)
 Vue.use(Tabs)
 Vue.use(Autocomplete)
 Vue.use(Tag)
+Vue.use(Steps)
+Vue.use(Step)
+Vue.use(DatePicker)
 
 Vue.prototype.$message = Message

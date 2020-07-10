@@ -11,7 +11,7 @@
             <el-button type="primary" icon="el-icon-edit" size="mini" @click="openRankDialog(rank._id, rank.level)"></el-button>
           </el-tooltip>
           <el-tooltip effect="dark" content="删除产品报价信息" placement="top" :enterable="false">
-            <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteRank(rank._id)"></el-button>
           </el-tooltip>
         </el-button-group>
       </el-col>
@@ -23,15 +23,15 @@
         border
       >
         <el-table-column prop="port" label="港口" min-width="25%"></el-table-column>
-        <el-table-column prop="description" label="描述" min-width="35%"></el-table-column>
+        <el-table-column prop="description" label="描述" min-width="30%"></el-table-column>
         <el-table-column prop="size" label="规格" min-width="10%"></el-table-column>
         <el-table-column prop="quote" label="价格(USD)" :formatter="formatUSD" min-width="10%"></el-table-column>
-        <el-table-column prop="spece" label="指标" min-width="20%"></el-table-column>
+        <el-table-column prop="spece" label="指标" min-width="25%"></el-table-column>
       </el-table>
     </el-row>
     <el-row type="flex" justify="end" align="center">
       <el-col :span="24" class="col-button">
-        <el-button type="primary" @click="addDialogVisible = true" size="mini">添加分类</el-button>
+        <el-button type="primary" @click="addDialogVisible = true" size="mini">添加报价</el-button>
       </el-col>
     </el-row>
 
@@ -107,7 +107,7 @@
       </span>
     </el-dialog>
     <!-- 修改产品报价对话框 -->
-    <el-dialog title="修改产品报价" :visible.sync="editDialogVisible" @close="" width="75%">
+    <el-dialog title="修改产品报价" :visible.sync="editDialogVisible" @close="rankEditDialogClose()" width="75%">
       <el-form ref="editRankFromRef" :model="editRank" label-width="55px" label-position="right" size="mini">
         <el-row :gutter="10">
           <el-col :span="16">
@@ -174,7 +174,7 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editDialogVisible = false" size="mini">取 消</el-button>
-        <el-button type="primary" @click="editDialogVisible = true" size="mini">更 新</el-button>
+        <el-button type="primary" @click="updateRankDialog()" size="mini">更 新</el-button>
       </span>
     </el-dialog>
   </div>
@@ -374,6 +374,48 @@ export default {
         return this.$message.error(res.meta.msg)
       }
       this.editRank = res.data.rank
+    },
+    // 更新分类报价
+    updateRankDialog() {
+      console.log('updateRankDialog')
+      this.$refs.editRankFromRef.validate(async val => {
+        if (!val) return
+        // 时间属性由数据库自动更新
+        delete this.editRank.createdAt
+        delete this.editRank.updatedAt
+        // 更新产品分类报价
+        const { data: res } = await this.$http.post('/rank/update/v1', { rank: this.editRank })
+        if (res.meta.status !== 200) {
+          return this.$message.err(res.meta.msg)
+        }
+        this.$message.success(res.meta.msg)
+        this.editDialogVisible = false
+        // 刷新列表
+        this.listRank()
+      })
+    },
+    // 删除产品分类报价
+    async deleteRank(id) {
+      console.log('deleteRank')
+      console.log(id)
+      const { data: res } = await this.$http.get('/rank/delete/v1', {
+        params: {
+          _id: id
+        }
+      })
+
+      if (res.meta.status !== 200) {
+        return this.$message.error(res.meta.msg)
+      }
+      this.$message.success(res.meta.msg)
+      // 刷新列表
+      this.listRank()
+    },
+    // 关闭编辑Rank对话框触发的事件
+    rankEditDialogClose() {
+      console.log('rankEditDialogClose')
+      this.$refs.editRankFromRef.resetFields()
+      this.editRank = {}
     }
   },
   created() {

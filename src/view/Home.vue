@@ -40,7 +40,7 @@
               <i class="el-icon-data-line"></i>
               <span slot="title">产品报价</span>
             </el-menu-item>
-            <el-menu-item index="/tmp">
+            <el-menu-item index="/ordermain">
               <i class="el-icon-edit-outline"></i>
               <span slot="title">创建订单</span>
             </el-menu-item>
