@@ -60,7 +60,7 @@
                     <el-input placeholder="公司名称" v-model="contract.seller"></el-input>
                   </el-form-item>
                   <el-form-item label="卖方地址" prop="seller">
-                    <el-input placeholder="公司地址" v-model="contract.seller" type="textarea" :rows="2"></el-input>
+                    <el-input placeholder="公司地址" v-model="contract.seller" type="textarea" :rows="3"></el-input>
                   </el-form-item>
                   <el-form-item label="卖方银行" prop="seller">
                     <el-input placeholder="银行信息" v-model="contract.seller" type="textarea" :rows="2"></el-input>
