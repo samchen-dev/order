@@ -11,7 +11,7 @@
       <el-col :span="6">
         <div style="text-align:right;">
           <el-button-group>
-            <el-button size="mini">PDF 导出</el-button>
+            <el-button size="mini" disabled>PDF 导出</el-button>
             <el-button size="mini" @click="exportInvoiceExcel()">Excel 导出</el-button>
           </el-button-group>
         </div>

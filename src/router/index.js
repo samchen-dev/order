@@ -10,7 +10,6 @@ import Product from '../view/form/Product.vue'
 import OrderMain from '../view/form/OrderMain.vue'
 import OrderWizard from '../view/form/OrderWizard.vue'
 import OrderExpert from '../view/form/OrderExpert.vue'
-import Tmp from '../view/form/tmp.vue'
 
 Vue.use(VueRouter)
 
@@ -46,9 +45,7 @@ const routes = [
       // 向导模式
       { path: '/orderwizard', component: OrderWizard },
       // 专家模式
-      { path: '/orderexpert', component: OrderExpert },
-      // 测试
-      { path: '/tmp', component: Tmp }
+      { path: '/orderexpert', component: OrderExpert }
     ]
   }
 ]

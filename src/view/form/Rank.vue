@@ -296,7 +296,7 @@ export default {
         this.rank.product = this.id
         const { data: res } = await this.$http.post('/rank/create/v1', { rank: this.rank })
         if (res.meta.status !== 200) {
-          return this.$message.err(res.meta.msg)
+          return this.$message.error(res.meta.msg)
         }
         this.$message.success(res.meta.msg)
         this.addDialogVisible = false

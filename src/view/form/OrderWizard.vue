@@ -32,8 +32,9 @@
             </div>
           </el-form>
           <div style="float: right;">
-            <el-button style="margin-top: 12px;" @click="up()" size="mini">上一步</el-button>
-            <el-button style="margin-top: 12px;" @click="next()" size="mini">下一步</el-button>
+            <el-button ref="upButton" style="margin-top: 12px;" @click="up()" size="mini">上一步</el-button>
+            <el-button ref="nextButton" style="margin-top: 12px;" @click="next()" size="mini" :disabled="!this.createFlag">下一步</el-button>
+            <el-button ref="createOrder" style="margin-top: 12px;" @click="createUpdateOrder()" size="mini" :disabled="this.createFlag">提交订单</el-button>
           </div>
         </el-col>
         <el-col :span="3">
@@ -50,12 +51,10 @@
 </template>
 
 <script>
-import OrderInfo from './OrderInfo'
 import Zero from './wizard/ZeroForm'
 import One from './wizard/OneForm'
 import Two from './wizard/TwoForm'
 import Three from './wizard/ThreeForm'
-import fs from 'fs'
 
 export default {
   name: 'orderWizard',
@@ -70,8 +69,12 @@ export default {
     return {
       // 激活步骤
       active: 0,
+      // 创建订单flag
+      createFlag: true,
       // 订单
       contract: {
+        // 用户ID
+        userID: window.sessionStorage.getItem('userID'),
         // 合同编号
         orderID: 'SBM20123',
         // 客户PO编号
@@ -133,6 +136,7 @@ export default {
         packaging: 'IN 25KG PP BAGS ON PALLET.',
         // 起运港
         loading: 'XINGANG, CHINA.',
+        // 目的港
         destination: 'AMBARLI, TURKEY',
         // 付款类型
         paymentType: 0,
@@ -151,14 +155,21 @@ export default {
       console.log('up', this.active)
       --this.active
       if (this.active < 0) this.active = 0
+      // 修改下一步、创建订单按钮状态
+      if (!this.createFlag) {
+        this.createFlag = !this.createFlag
+      }
     },
     // 下一步
     next() {
       console.log('nexe:', this.active)
+      // 验证标记
       let flag = true
+      // eslint-disable-next-line default-case
       switch (this.active) {
         case 0:
           // 验证公司信息
+          console.log('验证公司信息')
           this.$refs.contractFormRef.validateField(
             ['orderID', 'orderDate', 'location', 'seller', 'sellerAddress', 'bank', 'buyer', 'buyerAddress'],
             val => {
@@ -171,23 +182,52 @@ export default {
           break
         case 1:
           // 验证产品价格
+          console.log('验证产品价格')
           if (flag) this.active++
           break
         case 2:
           // 验证交易条款
+          console.log('验证交易条款')
           this.$refs.contractFormRef.validateField(['packaging', 'loading', 'destination'], val => {
             if (val) {
               flag = false
             }
           })
           if (flag) this.active++
+          // 修改下一步、创建订单按钮状态
+          if (this.createFlag) {
+            this.createFlag = !this.createFlag
+          }
           break
         case 3:
           // 验证预览
-          if (flag) this.active++
+          console.log('验证预览')
           break
       }
-      if (this.active > 3) this.active = 0
+    },
+    // 创建、更新订单
+    async createUpdateOrder() {
+      console.log('createUpdateOrder')
+      // 判断是创建订单、还是更新订单
+      if (!this.contract._id) {
+        // 创建新订单
+        const { data: res } = await this.$http.post('/order/create/v1', { order: this.contract })
+        console.log('res.meta.status:', res)
+        if (res.meta.status !== 200) {
+          return this.$message.error(res.meta.msg)
+        }
+        this.$message.success(res.meta.msg)
+        this.contract = res.data.order
+      } else {
+        // 更新订单
+        const { data: res } = await this.$http.post('/order/update/v1', { order: this.contract })
+        console.log('res.meta.status:', res)
+        if (res.meta.status !== 200) {
+          return this.$message.error(res.meta.msg)
+        }
+        this.$message.success(res.meta.msg)
+        this.contract = res.data.order
+      }
     }
   }
 }

@@ -63,10 +63,12 @@ export default {
 
         // 发送请求到server
         const { data: res } = await this.$http.post('/user/login/v1', this.loginForm)
-        console.log(res)
+        console.log('login data:', res)
         if (res.meta.status === 200) {
           // 存储token,提示登陆成功
           window.sessionStorage.setItem('token', res.data.token)
+          window.sessionStorage.setItem('user', res.data.user)
+          window.sessionStorage.setItem('userID', res.data.userID)
           this.$message.success('登陆成功！')
           // 跳转到路由到登陆后的主页面
           this.$router.replace('/home')

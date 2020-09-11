@@ -11,7 +11,7 @@
       <el-col :span="8">
         <div style="text-align:right;">
           <el-button-group>
-            <el-button size="mini">PDF 导出</el-button>
+            <el-button size="mini" disabled>PDF 导出</el-button>
             <el-button size="mini" @click="exportExcel()">Excel 导出</el-button>
           </el-button-group>
         </div>
@@ -121,6 +121,9 @@
       <el-col :span="6" class="preview-cell">
         <div style="word-spacing:2px">USD {{ contract.offerSheet.sum }}</div>
       </el-col>
+    </el-row>
+    <el-row class="preview-border-left-right-bottom">
+      <el-col :span="24" class="preview-cell"><div>PLEASE FILL IN THE AMOUNT IN CAPITALS!</div></el-col>
     </el-row>
     <el-row>
       <el-col :span="24">
@@ -276,6 +279,11 @@ export default {
           wrap_text: true
         }
       }
+      const borderFontRed = {
+        color: { rgb: 'FF0000' },
+        bottom: { style: 'thin' },
+        left: { style: 'thin' },
+      }
       let SBM = ''
       if (this.contract.PO === '') {
         SBM = `S/C NO.:${this.contract.orderID}\nDATE:${this.contract.orderDate}\nPLACE:${this.contract.location}`
@@ -344,16 +352,31 @@ export default {
       }
       // 添加合同附加条款
       for (const attach of this.contract.offerSheet.attachs) {
-        ws_data.push([{ v: attach.title, s: borderLeftTop }, { v: '', s: borderTop }, { v: '', s: borderTopRight }, { v: attach.amount, t: 'n', z: '#,##0.00', s: borderTopRight }])
+        ws_data.push(
+          [
+            { v: attach.title, s: borderLeftTop },
+            { v: '', s: borderTop },
+            { v: '', s: borderTopRight },
+            { v: attach.amount, t: 'n', z: '#,##0.00', s: borderTopRight }
+          ]
+        )
         i += 1
       }
       // 添加总价总数量
-      ws_data.push([
-        { v: 'TOTAL:', s: borderAll },
-        { v: this.contract.offerSheet.count, s: borderAll },
-        { v: '', s: borderAll },
-        { v: `${this.contract.offerSheet.sum}`, t: 'n', z: '#,##0.00', s: borderAll }
-      ])
+      ws_data.push(
+        [
+          { v: 'TOTAL:', s: borderAll },
+          { v: this.contract.offerSheet.count, s: borderAll },
+          { v: '', s: borderAll },
+          { v: `${this.contract.offerSheet.sum}`, t: 'n', z: '#,##0.00', s: borderAll }
+        ],
+        [
+          { v: 'PLEASE FILL IN THE AMOUNT IN CAPITALS!', s: borderFontRed },
+          { v: '', s: borderAll },
+          { v: '', s: borderAll },
+          { v: '', s: borderAll }
+        ]
+      )
       // 添加合同条款
       ws_data.push([OrderInfo.Terms[2]])
       ws_data.push([OrderInfo.Terms[3] + this.contract.packaging])
@@ -397,7 +420,8 @@ export default {
         { s: { r: 24 + i, c: 0 }, e: { r: 24 + i, c: 3 } },
         { s: { r: 25 + i, c: 0 }, e: { r: 25 + i, c: 3 } },
         { s: { r: 26 + i, c: 0 }, e: { r: 26 + i, c: 3 } },
-        { s: { r: 27 + i, c: 0 }, e: { r: 27 + i, c: 3 } }
+        { s: { r: 27 + i, c: 0 }, e: { r: 27 + i, c: 3 } },
+        { s: { r: 28 + i, c: 0 }, e: { r: 28 + i, c: 3 } }
       ]
       // 合并交货方式需要的空间
       if (i > 0) {
@@ -414,14 +438,13 @@ export default {
       rows[3] = { hpx: 30 }
       rows[7] = { hpx: 30 }
       rows[10] = { hpx: 30 }
-      rows[16 + i] = { hpx: 30 }
-      rows[19 + i] = { hpx: 45 }
-      rows[22 + i] = { hpx: 30 }
-      rows[23 + i] = { hpx: 70 }
-      rows[24 + i] = { hpx: 100 }
-      rows[25 + i] = { hpx: 70 }
-      rows[26 + i] = { hpx: 85 }
-
+      rows[17 + i] = { hpx: 30 }
+      rows[20 + i] = { hpx: 45 }
+      rows[23 + i] = { hpx: 30 }
+      rows[24 + i] = { hpx: 75 }
+      rows[25 + i] = { hpx: 105 }
+      rows[26 + i] = { hpx: 75 }
+      rows[27 + i] = { hpx: 90 }
       ws['!rows'] = rows
       this.$XLSX.utils.sheet_set_range_style(ws, 'A1:D1', {
         name: 'Times New Roman',
