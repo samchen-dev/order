@@ -1,6 +1,6 @@
 <template>
   <!-- 合同预览 -->
-  <div>
+  <div class="preview-div" ref="print">
     <el-row>
       <el-col :span="8">
         <div style="min-height: 1px;"></div>
@@ -81,10 +81,10 @@
         <div>{{ contract.locations }}</div>
       </el-col>
     </el-row>
-    <el-row v-for="(item, index) in contract.offerSheet.products">
+    <el-row v-for="(item, index) in contract.offerSheet.products" :key="index">
       <el-col :span="24" class="preview-border-left-right">
         <div class="preview-cell">{{ item.name }}</div>
-        <el-row v-for="(quotation, cIndex) in item.quotations">
+        <el-row v-for="(quotation, cIndex) in item.quotations" :key="cIndex">
           <el-col :span="6" class="preview-cell">
             <div>{{ quotation.size }}</div>
           </el-col>
@@ -100,7 +100,7 @@
         </el-row>
       </el-col>
     </el-row>
-    <el-row class="preview-border-left-right" v-for="(item, index) in contract.offerSheet.attachs">
+    <el-row class="preview-border-left-right" v-for="(item, index) in contract.offerSheet.attachs" :key="index">
       <el-col :span="18" class="preview-cell">
         <div>{{ item.title }}</div>
       </el-col>
@@ -229,7 +229,7 @@
   </div>
 </template>
 <script>
-import OrderInfo from '../OrderInfo'
+import Contract from './Contract'
 
 export default {
   name: 'CP',
@@ -242,244 +242,10 @@ export default {
   methods: {
     // 导出 SALES CONTRACT Excel
     exportExcel() {
-      const borderAll = {
-        top: { style: 'thin' },
-        bottom: { style: 'thin' },
-        left: { style: 'thin' },
-        right: { style: 'thin' }
-      }
-      const borderLeft = {
-        left: { style: 'thin' }
-      }
-      const borderRight = {
-        right: { style: 'thin' }
-      }
-      const borderLeftRight = {
-        left: { style: 'thin' },
-        right: { style: 'thin' }
-      }
-      const borderLeftTop = {
-        top: { style: 'thin' },
-        left: { style: 'thin' },
-      }
-      const borderTop = {
-        top: { style: 'thin' }
-      }
-      const borderTopRight = {
-        top: { style: 'thin' },
-        right: { style: 'thin' }
-      }
-      const borderLeftRightBottom = {
-        bottom: { style: 'thin' },
-        left: { style: 'thin' },
-        right: { style: 'thin' },
-        alignment: {
-          horizontal: 'center',
-          vertical: 'center',
-          wrap_text: true
-        }
-      }
-      const borderFontRed = {
-        color: { rgb: 'FF0000' },
-        bottom: { style: 'thin' },
-        left: { style: 'thin' },
-      }
-      let SBM = ''
-      if (this.contract.PO === '') {
-        SBM = `S/C NO.:${this.contract.orderID}\nDATE:${this.contract.orderDate}\nPLACE:${this.contract.location}`
-      } else {
-        SBM = `S/C NO.:${this.contract.orderID}\nPO.:${this.contract.PO}\nDATE:${this.contract.orderDate}\nPLACE:${this.contract.location}`
-      }
-      const ws_data = [
-        // 添加合同条款
-        ['SALES CONTRACT'],
-        [''],
-        [`SELLER: ${this.contract.seller}`, '', '', SBM],
-        [`ADDRESS: ${this.contract.sellerAddress}`],
-        [`TEL: ${this.contract.sellerTEL} FAX: ${this.contract.sellerFAX}`],
-        [''],
-        [`BUYER: ${this.contract.buyer}`],
-        [`ADDRESS: ${this.contract.buyerAddress}`],
-        [`TEL: ${this.contract.buyerTEL} FAX: ${this.contract.buyerFAX}`],
-        [''],
-        [OrderInfo.Terms[0]],
-        [OrderInfo.Terms[1]],
-        [
-          { v: 'DESCRIPTIONS OF GOODS', s: borderAll },
-          { v: 'QUANTITY', s: borderAll },
-          { v: 'UNIT PRICE', s: borderAll },
-          { v: 'TOTAL AMOUNT (USD)', s: borderAll }
-        ]
-      ]
-      // 添加合同产品价格
-      // 计算合并的偏移量
-      let i = 0
-      console.log('this.contract.offerSheet.products:', this.contract.offerSheet.products.length)
-      for (const product of this.contract.offerSheet.products) {
-        if (product.name.length > 0) {
-          if (i === 0) {
-            ws_data.push(
-              [
-                { v: product.name, s: borderLeftRight },
-                { v: '', s: borderLeftRight },
-                { v: this.contract.locations, s: borderLeftRightBottom },
-                { v: '', s: borderLeftRightBottom }]
-            )
-          } else {
-            ws_data.push(
-              [
-                { v: product.name, s: borderLeftRight },
-                { v: '', s: borderLeftRight },
-                { v: '', s: borderLeftRight },
-                { v: '', s: borderLeftRight }
-              ]
-            )
-          }
-          i += 1
-        }
-        for (const quotation of product.quotations) {
-          console.log('quotation.total:', quotation.total)
-          ws_data.push(
-            [
-              { v: quotation.size, s: borderLeftRight },
-              { v: `${quotation.quantity} ${product.unit}`, s: borderLeftRight },
-              { v: `USD ${quotation.price} / ${product.unit}`, s: borderLeftRight },
-              { v: quotation.total, t: 'n', z: '#,##0.00', s: borderLeftRight }
-            ]
-          )
-          i += 1
-        }
-      }
-      // 添加合同附加条款
-      for (const attach of this.contract.offerSheet.attachs) {
-        ws_data.push(
-          [
-            { v: attach.title, s: borderLeftTop },
-            { v: '', s: borderTop },
-            { v: '', s: borderTopRight },
-            { v: attach.amount, t: 'n', z: '#,##0.00', s: borderTopRight }
-          ]
-        )
-        i += 1
-      }
-      // 添加总价总数量
-      ws_data.push(
-        [
-          { v: 'TOTAL:', s: borderAll },
-          { v: this.contract.offerSheet.count, s: borderAll },
-          { v: '', s: borderAll },
-          { v: `${this.contract.offerSheet.sum}`, t: 'n', z: '#,##0.00', s: borderAll }
-        ],
-        [
-          { v: 'PLEASE FILL IN THE AMOUNT IN CAPITALS!', s: borderFontRed },
-          { v: '', s: borderAll },
-          { v: '', s: borderAll },
-          { v: '', s: borderAll }
-        ]
-      )
-      // 添加合同条款
-      ws_data.push([OrderInfo.Terms[2]])
-      ws_data.push([OrderInfo.Terms[3] + this.contract.packaging])
-      ws_data.push([OrderInfo.Terms[4]])
-      ws_data.push([OrderInfo.Terms[5] + this.contract.loading])
-      ws_data.push([OrderInfo.Terms[6] + this.contract.destination])
-      ws_data.push([OrderInfo.Terms[7] + this.contract.payment])
-      ws_data.push([OrderInfo.Terms[8]])
-      ws_data.push([OrderInfo.Terms[9]])
-      ws_data.push([OrderInfo.Terms[10]])
-      ws_data.push([OrderInfo.Terms[11]])
-      ws_data.push([OrderInfo.Terms[12]])
-      ws_data.push([OrderInfo.Terms[13]])
-      ws_data.push([OrderInfo.Terms[14]])
-      ws_data.push([''])
-      ws_data.push([OrderInfo.Terms[15], '', OrderInfo.Terms[16], ''])
-      ws_data.push([''])
-      ws_data.push([''])
-      const ws = this.$XLSX.utils.aoa_to_sheet(ws_data)
-      const merges = [
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }, // 合并标题
-        { s: { r: 2, c: 0 }, e: { r: 2, c: 1 } }, // 合并卖方名称
-        { s: { r: 3, c: 0 }, e: { r: 3, c: 1 } }, // 合并卖方地址
-        { s: { r: 4, c: 0 }, e: { r: 4, c: 1 } }, // 合并卖方联系方式
-        { s: { r: 6, c: 0 }, e: { r: 6, c: 1 } }, // 合并买方名称
-        { s: { r: 7, c: 0 }, e: { r: 7, c: 1 } }, // 合并买方地址
-        { s: { r: 8, c: 0 }, e: { r: 8, c: 1 } }, // 合并买方联系方式
-        { s: { r: 2, c: 3 }, e: { r: 4, c: 3 } }, // 合并合同时间、编号、地点、PO编号单元格
-        { s: { r: 10, c: 0 }, e: { r: 10, c: 3 } },
-        { s: { r: 11, c: 0 }, e: { r: 11, c: 3 } },
-        { s: { r: 14 + i, c: 0 }, e: { r: 14 + i, c: 3 } },
-        { s: { r: 15 + i, c: 0 }, e: { r: 15 + i, c: 3 } },
-        { s: { r: 16 + i, c: 0 }, e: { r: 16 + i, c: 3 } },
-        { s: { r: 17 + i, c: 0 }, e: { r: 17 + i, c: 3 } },
-        { s: { r: 18 + i, c: 0 }, e: { r: 18 + i, c: 3 } },
-        { s: { r: 19 + i, c: 0 }, e: { r: 19 + i, c: 3 } },
-        { s: { r: 20 + i, c: 0 }, e: { r: 20 + i, c: 3 } },
-        { s: { r: 21 + i, c: 0 }, e: { r: 21 + i, c: 3 } },
-        { s: { r: 22 + i, c: 0 }, e: { r: 22 + i, c: 3 } },
-        { s: { r: 23 + i, c: 0 }, e: { r: 23 + i, c: 3 } },
-        { s: { r: 24 + i, c: 0 }, e: { r: 24 + i, c: 3 } },
-        { s: { r: 25 + i, c: 0 }, e: { r: 25 + i, c: 3 } },
-        { s: { r: 26 + i, c: 0 }, e: { r: 26 + i, c: 3 } },
-        { s: { r: 27 + i, c: 0 }, e: { r: 27 + i, c: 3 } },
-        { s: { r: 28 + i, c: 0 }, e: { r: 28 + i, c: 3 } }
-      ]
-      // 合并交货方式需要的空间
-      if (i > 0) {
-        merges.push({ s: { r: 13, c: 2 }, e: { r: 13, c: 3 } })
-      }
-      ws['!merges'] = merges
-      ws['!sheetFormat'] = {
-        row: {
-          hpx: 20
-        }
-      }
-      ws['!cols'] = [{ wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 20 }]
-      const rows = []
-      rows[3] = { hpx: 30 }
-      rows[7] = { hpx: 30 }
-      rows[10] = { hpx: 30 }
-      rows[17 + i] = { hpx: 30 }
-      rows[20 + i] = { hpx: 45 }
-      rows[23 + i] = { hpx: 30 }
-      rows[24 + i] = { hpx: 75 }
-      rows[25 + i] = { hpx: 105 }
-      rows[26 + i] = { hpx: 75 }
-      rows[27 + i] = { hpx: 90 }
-      ws['!rows'] = rows
-      this.$XLSX.utils.sheet_set_range_style(ws, 'A1:D1', {
-        name: 'Times New Roman',
-        sz: 14,
-        bold: true,
-        alignment: {
-          horizontal: 'center',
-          vertical: 'center',
-          wrapText: true
-        }
-      })
-      this.$XLSX.utils.sheet_set_range_style(ws, 'A2:D100', {
-        name: 'Times New Roman',
-        sz: 8,
-        bold: true,
-        alignment: {
-          vertical: 'center',
-          wrapText: true
-        }
-      })
-      this.$XLSX.utils.sheet_set_range_style(ws, 'D3:D5', {
-        alignment: {
-          horizontal: 'left',
-          vertical: 'top',
-          wrapText: true
-        }
-      })
-      const wb = this.$XLSX.utils.book_new()
-      this.$XLSX.utils.book_append_sheet(wb, ws, 'sheet1')
-      this.$XLSX.writeFile(
-        wb,
-        `SALES CONTRACT -${this.contract.orderID}.xlsx`,
-        { bookType: 'xlsx', bookSST: false, type: 'binary', cellStyles: true }
-      )
-      console.log('ws', ws)
+      Contract.exportContract(this.contract)
+    },
+    printPDF() {
+      this.$Print(this.$refs.print)
     }
   }
 }

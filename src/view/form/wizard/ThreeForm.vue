@@ -12,9 +12,9 @@
 </template>
 
 <script>
-import OrderInfo from '../OrderInfo'
-import CP from './ContractPreview'
-import IP from './InvoicePreview'
+
+import CP from './ContractPreview.vue'
+import IP from './InvoicePreview.vue'
 
 export default {
   name: 'ThreeForm',

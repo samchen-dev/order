@@ -7,10 +7,24 @@
           prop="orderID"
           :rules="[
             { required: true, message: '合同编号不能为空！', trigger: 'blur' },
-            { min: 8, max: 8, message: '合同编号长度8位,已SBM开头！', trigger: 'blur' }
+            { pattern: /^SBM[0-9]{5}$/, message: '订单号不符合名目规则' }
           ]"
         >
-          <el-input placeholder="合同编号(SBM开头)" v-model="contract.orderID"></el-input>
+          <el-select
+            placeholder="合同编号(SBM开头)"
+            :disabled="orderIDisabled"
+            v-model="contract.orderID"
+            filterable
+            allow-create
+            default-first-option>
+            <el-option
+              v-for="item in orderIDS"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-col>
       <el-col :span="6">
@@ -22,7 +36,7 @@
         <el-form-item label="日期" prop="orderDate" :rules="[{ required: true, message: '合同日期不能为空！', trigger: 'blur' }]">
           <el-date-picker
             v-model="contract.orderDate"
-            align="right"
+            align="left"
             type="date"
             placeholder="选择日期"
             format="yyyy-MM-dd"
@@ -114,6 +128,10 @@ export default {
     contract: {
       type: Object,
       required: true
+    },
+    openType: {
+      type: String,
+      default: 'new'
     }
   },
   data() {
@@ -147,10 +165,25 @@ export default {
             }
           }
         ]
-      }
+      },
+      // 在更新订单情况下，订单号不能修改
+      orderIDisabled: this.openType === 'update',
+      // 潜在订单号数组
+      orderIDS: []
     }
   },
   methods: {
+    // 转换大小写
+    buyerUpperCase (value) {
+      console.log('upperCase', value)
+      if (!value) return ''
+      this.contract.buyer = value.toUpperCase()
+    },
+    buyerAddressUpperCase (value) {
+      console.log('upperCase', value)
+      if (!value) return ''
+      this.contract.buyerAddress = value.toUpperCase()
+    },
     // 改变卖方类型
     sellerChange(sellerType) {
       console.log('sellerChange', sellerType)
@@ -160,6 +193,15 @@ export default {
       this.contract.sellerAddress = OrderInfo.sellerAddress[sellerType]
       // 修改银行类型
       this.contract.bank = OrderInfo.bank[sellerType]
+    },
+    // 获取潜在订单号
+    async getPotentialOrderID() {
+      console.log('getPotentialOrderID')
+      const { data: res } = await this.$http.get('/order/potentialOrderID/v1')
+      if (res.meta.status === 200) {
+        console.log(res.data.orderIDS)
+        this.orderIDS = res.data.orderIDS
+      }
     }
   },
   mounted() {
@@ -173,6 +215,13 @@ export default {
     this.contract.bank = OrderInfo.bank[this.contract.sellerType]
     // 默认的付款类型
     this.contract.payment = OrderInfo.payment[this.contract.paymentType]
+  },
+  // 初始化
+  created() {
+    // 加载获取潜在订单号
+    if (this.openType !== 'update') {
+      this.getPotentialOrderID()
+    }
   }
 }
 </script>

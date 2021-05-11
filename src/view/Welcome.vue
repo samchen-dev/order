@@ -1,12 +1,35 @@
 <template>
   <div class="wrap-banner">
-    <h2 class="main-title">WELCOME!</h2>
+    <h2 style="text-transform:uppercase;" class="main-title">WELCOME {{ user }} !</h2>
+    <el-dialog title="警告" :visible.sync="errorDialogVisible" width="30%" center>
+      <span v-text="msg"></span>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="errorDialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Welcome'
+  name: 'Welcome',
+  data() {
+    return {
+      // 用户名称
+      user: window.sessionStorage.getItem('user'),
+      // 错误提示信息
+      msg: null,
+      // 错误对话框控制标记
+      errorDialogVisible: false,
+    }
+  },
+  created() {
+    // 判断是否需要打开错误提示框
+    if (this.$route.query.msg) {
+      this.msg = this.$route.query.msg
+      this.errorDialogVisible = true
+    }
+  }
 }
 </script>
 

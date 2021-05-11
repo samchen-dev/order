@@ -9,7 +9,7 @@
       <el-form :model="loginForm" :rules="loginRules" ref="loginForm" label-width="0px" class="login_form">
         <!-- 用户名 -->
         <el-form-item prop="username">
-          <el-input v-model="loginForm.username" prefix-icon="el-icon-user-solid"></el-input>
+          <el-input v-model="loginForm.username" prefix-icon="el-icon-user-solid" :autofocus="true"></el-input>
         </el-form-item>
         <!-- 密码 -->
         <el-form-item prop="password">
@@ -45,7 +45,6 @@ export default {
         ]
       }
     };
-    
     let mailPass = (rule, value, callback) => {
       console.log('mailPass')
     }
@@ -69,6 +68,7 @@ export default {
           window.sessionStorage.setItem('token', res.data.token)
           window.sessionStorage.setItem('user', res.data.user)
           window.sessionStorage.setItem('userID', res.data.userID)
+          window.sessionStorage.setItem('user.roles', res.data.roles)
           this.$message.success('登陆成功！')
           // 跳转到路由到登陆后的主页面
           this.$router.replace('/home')

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-row :gutter="10" v-for="(item, index) in contract.offerSheet.products">
+    <el-row :gutter="10" v-for="(item, index) in contract.offerSheet.products" :key="index">
       <el-col :span="21">
         <el-row>
           <el-col :span="12">
@@ -23,7 +23,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row v-for="(quotation, cIndex) in item.quotations">
+        <el-row v-for="(quotation, cIndex) in item.quotations" :key="cIndex">
           <el-col :span="5">
             <el-form-item class="offerSheet-el-form-item" label="粒度" :prop="'offerSheet.products.' + index + '.quotations.' + cIndex + '.size'">
               <el-input v-model="quotation.size"></el-input>
@@ -71,7 +71,7 @@
         </el-button-group>
       </el-col>
     </el-row>
-    <el-row :gutter="10" v-for="(item, index) in contract.offerSheet.attachs">
+    <el-row :gutter="10" v-for="(item, index) in contract.offerSheet.attachs" :key="index">
       <el-col :span="21">
         <el-row>
           <el-col :span="18">

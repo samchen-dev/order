@@ -32,7 +32,14 @@ import {
   Tag,
   Steps,
   Step,
-  DatePicker
+  DatePicker,
+  Upload,
+  Collapse,
+  CollapseItem,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  Pagination,
 } from 'element-ui'
 import Vue from 'vue'
 
@@ -69,5 +76,11 @@ Vue.use(Tag)
 Vue.use(Steps)
 Vue.use(Step)
 Vue.use(DatePicker)
-
+Vue.use(Upload)
+Vue.use(Collapse)
+Vue.use(CollapseItem)
+Vue.use(Dropdown)
+Vue.use(DropdownMenu)
+Vue.use(DropdownItem)
+Vue.use(Pagination)
 Vue.prototype.$message = Message

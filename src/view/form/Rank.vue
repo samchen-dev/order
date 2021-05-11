@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 产品价格列表 -->
-    <el-row v-for="rank in ranks">
+    <el-row v-for="(rank, index) in ranks" :key="index">
       <el-col class="col-rank-header" :span="16">
         {{ rank.level }}
       </el-col>
@@ -64,7 +64,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row :gutter="10" v-for="(item, index) in rank.assort" type="flex" justify="center" align="middle">
+        <el-row :gutter="10" v-for="(item, index) in rank.assort" :key="index" type="flex" justify="center" align="middle">
           <el-col :span="6">
             <el-form-item label="规格:" :prop="'assort.' + index + '.size'" :rules="{ required: true, message: '规格不能为空！', trigger: 'blur' }">
               <el-input placeholder="规格" v-model="item.size" maxlength="40" show-word-limit></el-input>
@@ -135,7 +135,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-row :gutter="10" v-for="(item, index) in editRank.assort" type="flex" justify="center" align="middle">
+        <el-row :gutter="10" v-for="(item, index) in editRank.assort" :key="index" type="flex" justify="center" align="middle">
           <el-col :span="6">
             <el-form-item label="规格:" :prop="'assort.' + index + '.size'" :rules="{ required: true, message: '规格不能为空！', trigger: 'blur' }">
               <el-input placeholder="规格" v-model="item.size" maxlength="40" show-word-limit></el-input>

@@ -133,7 +133,7 @@
           <el-col :span="24">
             <el-form-item prop="roles">
               <el-checkbox-group v-model="editUserForm.roles">
-                <el-checkbox name="roles" v-for="item in editRoleList" :label="item._id">{{ item.title }}</el-checkbox>
+                <el-checkbox name="roles" v-for="item in editRoleList" :label="item._id" :key="item._id">{{ item.title }}</el-checkbox>
               </el-checkbox-group>
             </el-form-item>
           </el-col>
@@ -162,7 +162,7 @@ export default {
         callback()
       }
     }
-    // 验证邮箱
+    // 验证电话
     const validatePhone = (rule, value, callback) => {
       console.log('validatePhone')
       if (value === '') {
@@ -308,7 +308,7 @@ export default {
     },
     // 返回用户列表
     async getUserList() {
-      console.log('getUsername')
+      console.log('getUserList')
       const username = this.search ? this.search : ''
       console.log(username)
       const { data: res } = await this.$http.get('/user/list/v1', {
@@ -321,9 +321,11 @@ export default {
       }
       const users = res.data.userList
       this.userList = users
+      console.log('userList', this.userList)
     },
     // 更新用户状态
     async updateDisableFlog(userInfo) {
+      console.log('updateDisableFlog')
       const { data: res } = await this.$http.get('/user/updateDisableFlog/v1', {
         params: {
           _id: userInfo._id,

@@ -18,13 +18,15 @@
 </template>
 
 <script>
+import OrderInfo from './OrderInfo'
+
 export default {
   name: 'orderMain',
   methods: {
     gotolink(url) {
       this.$router.replace(url)
     }
-  }
+  },
 }
 </script>
 
