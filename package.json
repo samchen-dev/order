@@ -23,7 +23,7 @@
     "vue": "^2.6.11",
     "vue-router": "^3.1.6",
     "xe-utils": "^2.4.8",
-    "xlsx": "^0.16.5",
+    "xlsx": "^0.17.0",
     "xlsx-style": "^0.8.13"
   },
   "devDependencies": {
