@@ -16,7 +16,7 @@
     "exceljs": "^4.1.1",
     "file-saver": "^2.0.2",
     "jszip": "^3.5.0",
-    "moment": "^2.26.0",
+    "moment": "^2.29.2",
     "pikaz-excel-js": "^0.2.14",
     "print-js": "^1.6.0",
     "register-service-worker": "^1.7.1",
