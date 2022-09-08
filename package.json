@@ -15,7 +15,7 @@
     "element-ui": "^2.14.1",
     "exceljs": "^4.1.1",
     "file-saver": "^2.0.2",
-    "jszip": "^3.5.0",
+    "jszip": "^3.7.0",
     "moment": "^2.26.0",
     "pikaz-excel-js": "^0.2.14",
     "print-js": "^1.6.0",
